@@ -1,0 +1,14 @@
+.button {
+  font-family: 'Press Start 2P', cursive;
+  padding: 1rem;
+  border-width: 6px;
+}
+.button.matrix-button {
+  padding: .65rem;
+  border-width: 4px;
+  border-bottom-color: #808080;
+  border-right-color: #808080;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  background-color: #c5c5c5;
+}
