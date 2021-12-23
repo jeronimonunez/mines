@@ -12,13 +12,23 @@
 .cell {
   display: flex;  
 }
+.matrix-button {
+  width: 30px;
+  height: 30px;
+}
 .matrix-button[data-revealed=true] {
   display: none;
 }
 .cell-value {
-  border: 1px solid #ccc;
+  border: 1px solid #666;
   display: none;
 }
 .cell-value[data-revealed=true] {
-  display: block;
+  display: flex;
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  align-items: center;
+  background-color: #c6c6c6;
+  justify-content: center;
 }
