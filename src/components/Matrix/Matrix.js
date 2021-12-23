@@ -13,22 +13,22 @@ const Matrix = ({ width, height, mines }) => {
   let matrixHelper = [];
   let matrix = [];
 
-  const createBoardMatrix = ( width, height ) => {
-    for(let i = 0; i < height; i++) {
+  const createBoardMatrix = (width, height) => {
+    for (let i = 0; i < height; i++) {
       matrixHelper.push([]);
-      for(let j = 0; j < width; j++) {
+      for (let j = 0; j < width; j++) {
         matrixHelper[i][j] = 0;
-      } 
+      }
     }
     return matrixHelper;
   }
-  
+
   // for (var i = 0; i < numrows; i++) {
   //   rows.push(<Row numColums={numcolumns} numRows={numrows} key={i} />);
   // }
 
   const fillBoard = () => {
-    
+
     // def llenar_tablero(t, bombs=99, p=None):
     // if not p:
     //     p = bombs / (len(t) * len(t[0]))
@@ -52,15 +52,15 @@ const Matrix = ({ width, height, mines }) => {
         let row = matrix[index];
 
         for (let j = 0; j < row.length; j++) {
-          
+
           let pb = Math.random();
 
-          if(pb < p && row[j] != -1) {
+          if (pb < p && row[j] != -1) {
             console.log('aqui');
             row[j] = -1;
             minesCounter--;
             console.log(matrix)
-            if(minesCounter == 0) {
+            if (minesCounter == 0) {
               return;
             }
           }
@@ -73,52 +73,65 @@ const Matrix = ({ width, height, mines }) => {
 
     let counter = 0;
 
-    if(i > 0 && j > 0 && matrix[i - 1][j - 1] == -1) counter++;
-    if(i > 0 && j > 0 && matrix[i - 1][j - 1] == -1) counter++;
+    if (i > 0 && j > 0 && matrix[i - 1][j - 1] == -1) counter++;
+    if (i > 0 && matrix[i - 1][j] == -1) counter++;
+    if (i > 0 && j < matrix[0].length - 1 && matrix[i - 1][j + 1] == -1) counter++;
+    if (j > 0 && matrix[i][j - 1] == -1) counter++;
+    if (j > 0 && j < matrix[0].length - 1 && matrix[i][j + 1] == -1) counter++;
+    if (i < matrix.length - 1 && j > 0 && matrix[i + 1][j - 1] == -1) counter++;
+    if (i < matrix.length - 1 && matrix[i + 1][j] == -1) counter++;
+    if (i < matrix.length - 1 && j < matrix[0].length - 1 && matrix[i + 1][j + 1] == -1) counter++;
 
     return counter;
   }
 
   const fillValues = () => {
-    for(let i = 0; i < matrix.length; i++) {
+    for (let i = 0; i < matrix.length; i++) {
       let row = matrix[i];
-      for(let j = 0; j < row.length; j++) {
+      for (let j = 0; j < row.length; j++) {
         let value = matrix[i][j];
-        if(value == -1) {
+        if (value == -1) {
           continue;
         } else {
           matrix[i][j] = checkAdjacent(matrix, i, j);
         }
-      } 
+      }
     }
   }
 
+  // useEffect(() => {
+  //   document.addEventListener("contextmenu", (event) => {
+  //     event.preventDefault();
+  //     console.log(event);
+  //   });
+  // }, []);
+
   matrix = createBoardMatrix(width, height);
   console.log(matrix);
-  
+
   fillBoard();
   fillValues();
   console.log(matrix);
-  
+
   return (
     <div className="matrix large">
       {/* Default 30x16 */}
       {
         matrix.map((row, index) => (
-          <Row key={index} cells={row} />
+          <Row key={index} rowIndex={index} cells={row} />
         ))
       }
     </div>
   )
 };
 
-const Row = ({ cells }) => {
+const Row = ({ cells, rowIndex }) => {
 
   return (
     <div className="row">
       {
         cells.map((cell, index) => (
-          <Cell value={cell} key={index} />
+          <Cell value={cell} rowIndex={rowIndex} cellIndex={index} key={index} />
         ))
       }
     </div>
@@ -126,20 +139,44 @@ const Row = ({ cells }) => {
 
 }
 
-const Cell = ({ value }) => {
+const Cell = ({ value, rowIndex, cellIndex }) => {
   const [revealed, setRevealed] = useState(false);
+  const [flagged, setFlagged] = useState(false);
 
   const toggleState = () => {
     console.log(revealed);
     setRevealed(true);
   }
 
+  const toggleFlag = () => {
+    setFlagged(!flagged);
+  }
+
+  const handleRightClick = evt => {
+    evt.preventDefault();
+    console.log(evt);
+    toggleFlag();
+  };
+
+  const handleLeftClick = () => {
+    !flagged && toggleState();
+  };
+
+  const handleInteraction = evt => {
+    console.log(evt.type);
+    if (evt.type == 'click') {
+      handleLeftClick();
+    } else if (evt.type == 'contextmenu') {
+      handleRightClick(evt);
+    }
+  }
+
   return (
     <div className="cell">
-      <Button className="matrix-button" dataRevealed={revealed} onClick={toggleState}></Button>
-      <span className="cell-value" data-revealed={revealed}>
+      <Button className="matrix-button" dataRevealed={revealed} dataFlagged={flagged} onClick={handleInteraction} onContextMenu={handleInteraction} dataCellId={`cell-id-${rowIndex}-${cellIndex}`}></Button>
+      <span className={`cell-value cell-color-${value}`} data-revealed={revealed}>
         {value == -1 && <MineIcon />}
-        {value != -1 && <>{value}</>}
+        {value != -1 && value != 0 && <>{value}</>}
       </span>
     </div>
   )
