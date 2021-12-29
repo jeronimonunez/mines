@@ -3,6 +3,7 @@ import Button from "../Button";
 import MineIcon from "../Icons/MineIcon";
 import './../../styling/Matrix.css';
 import PropTypes from "prop-types";
+import FaceIcon from "../Icons/FaceIcon";
 
 const Matrix = ({ width, height, mines }) => {
 
@@ -12,6 +13,8 @@ const Matrix = ({ width, height, mines }) => {
   let minesCounter = mines;
   let matrixHelper = [];
   let matrix = [];
+
+  const [gameOver, setGameOver] = useState(false);
 
   const createBoardMatrix = (width, height) => {
     for (let i = 0; i < height; i++) {
@@ -99,39 +102,45 @@ const Matrix = ({ width, height, mines }) => {
     }
   }
 
-  // useEffect(() => {
-  //   document.addEventListener("contextmenu", (event) => {
-  //     event.preventDefault();
-  //     console.log(event);
-  //   });
-  // }, []);
+  const handleCellAction = value => {
+    console.log(value);
+    switch (value) {
+      case -1:
+        setGameOver(true);
+        break;
+    
+      default:
+        break;
+    }
+  }
 
   matrix = createBoardMatrix(width, height);
-  console.log(matrix);
 
   fillBoard();
   fillValues();
-  console.log(matrix);
 
   return (
-    <div className="matrix large">
-      {/* Default 30x16 */}
-      {
-        matrix.map((row, index) => (
-          <Row key={index} rowIndex={index} cells={row} />
-        ))
-      }
+    <div className="matrix-container">
+      <FaceIcon sad={gameOver} />
+      <div className="matrix large">
+        {/* Default 30x16 */}
+        {
+          matrix.map((row, index) => (
+            <Row key={index} rowIndex={index} cells={row} handleCellAction={handleCellAction} />
+          ))
+        }
+      </div>
     </div>
   )
 };
 
-const Row = ({ cells, rowIndex }) => {
+const Row = ({ cells, rowIndex, handleCellAction }) => {
 
   return (
     <div className="row">
       {
         cells.map((cell, index) => (
-          <Cell value={cell} rowIndex={rowIndex} cellIndex={index} key={index} />
+          <Cell value={cell} rowIndex={rowIndex} cellIndex={index} key={index} handleCellAction={handleCellAction} />
         ))
       }
     </div>
@@ -139,7 +148,7 @@ const Row = ({ cells, rowIndex }) => {
 
 }
 
-const Cell = ({ value, rowIndex, cellIndex }) => {
+const Cell = ({ value, rowIndex, cellIndex, handleCellAction }) => {
   const [revealed, setRevealed] = useState(false);
   const [flagged, setFlagged] = useState(false);
 
@@ -169,6 +178,7 @@ const Cell = ({ value, rowIndex, cellIndex }) => {
     } else if (evt.type == 'contextmenu') {
       handleRightClick(evt);
     }
+    if(!flagged) handleCellAction(value);
   }
 
   return (
