@@ -24,3 +24,13 @@
     right: 7px;
     top: 7px;
 }
+
+.half-circle {
+    width: 200px;
+    height: 100px;
+    background-color: gold;
+    border-top-left-radius: 110px;
+    border-top-right-radius: 110px;
+    border: 10px solid gray;
+    border-bottom: 10px solid gray;
+}
